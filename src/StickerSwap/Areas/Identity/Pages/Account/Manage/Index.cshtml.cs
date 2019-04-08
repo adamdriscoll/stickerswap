@@ -66,6 +66,9 @@ namespace StickerSwap.Areas.Identity.Pages.Account.Manage
 
             [Display(Name = "ZIP Code")]
             public string Zip { get; set; }
+
+            [Display(Name = "Receive Emails")]
+            public bool EnableEmails { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -91,7 +94,8 @@ namespace StickerSwap.Areas.Identity.Pages.Account.Manage
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Zip = user.ZipCode,
-                State = user.State
+                State = user.State,
+                EnableEmails = user.EnableEmail
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
@@ -131,6 +135,7 @@ namespace StickerSwap.Areas.Identity.Pages.Account.Manage
             updateUser.Address = Input.Address;
             updateUser.ZipCode = Input.Zip;
             updateUser.State = Input.State;
+            updateUser.EnableEmail = Input.EnableEmails;
 
             await _dbContext.SaveChangesAsync();
 

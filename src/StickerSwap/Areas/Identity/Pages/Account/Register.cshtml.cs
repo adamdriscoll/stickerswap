@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using StickerSwap.Data;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace StickerSwap.Areas.Identity.Pages.Account
 {
@@ -20,17 +22,20 @@ namespace StickerSwap.Areas.Identity.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _applicationDbContext;
 
         public RegisterModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext applicationDbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _applicationDbContext = applicationDbContext;
         }
 
         [BindProperty]
@@ -48,6 +53,9 @@ namespace StickerSwap.Areas.Identity.Pages.Account
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
+
+            [Display(Name = "Referral Code")]
+            public string ReferralCode { get; set; }
 
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
@@ -71,7 +79,17 @@ namespace StickerSwap.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = Input.UserName, Email = Input.Email };
+                if (!string.IsNullOrEmpty(Input.ReferralCode))
+                {
+                    var invite = _applicationDbContext.Invites.Include(m => m.User).FirstOrDefault(m => m.Key == Input.ReferralCode);
+                    if (invite != null)
+                    {
+                        invite.User.Credits += 5;
+                        await _applicationDbContext.SaveChangesAsync();
+                    }
+                }
+
+                var user = new User { UserName = Input.UserName, Email = Input.Email, EnableEmail = true };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -87,8 +105,7 @@ namespace StickerSwap.Areas.Identity.Pages.Account
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return LocalRedirect(returnUrl);
+                    return RedirectToAction("ConfirmEmail", "About");
                 }
                 foreach (var error in result.Errors)
                 {

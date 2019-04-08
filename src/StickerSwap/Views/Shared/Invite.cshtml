@@ -3,15 +3,16 @@
         <div class="card">
             <div class="card-header text-center">Invite</div>
             <div class="card-body">
-                <p class="lead">If your friend signs up to Sticker Swap, you'll get 5 free credits.</p>
-                <div class="form-group">
-                    <label class="control-label">Email</label>
-                    <input class="form-control" />
 
-                </div>
-            </div>
-            <div class="card-footer">
-                <a href="#" class="btn btn-primary">Invite</a>
+                <p class="lead">If your friend signs up to Sticker Swap, you'll get 5 free credits.</p>
+                <form method="post" asp-action="Post" asp-controller="Invite" class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <input class="form-control" name="EmailAddress" placeholder="Email" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <input type="submit" value="Invite" class="btn btn-primary" />
+                    </div>
+                </form>
             </div>
         </div>
     </div>

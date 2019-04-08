@@ -18,5 +18,10 @@ namespace StickerSwap.Controllers
         {
             return View("InvitePage");
         }
+
+        public IActionResult ConfirmEmail()
+        {
+            return View();
+        }
     }
 }

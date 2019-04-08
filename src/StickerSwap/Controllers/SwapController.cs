@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StickerSwap.Data;
@@ -15,10 +16,12 @@ namespace StickerSwap.Controllers
     public class SwapController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IEmailSender _emailSender;
 
-        public SwapController(ApplicationDbContext dbContext)
+        public SwapController(ApplicationDbContext dbContext, IEmailSender emailSender)
         {
             _dbContext = dbContext;
+            _emailSender = emailSender;
         }
 
         public IActionResult Index()
@@ -27,11 +30,11 @@ namespace StickerSwap.Controllers
 
             var swapsViewModel = new SwapsViewModel();
 
-            var picks = _dbContext.Swaps.Include(m => m.Sticker).ThenInclude(m => m.User).Include(m => m.User).Where(m => m.User.Id == userId && m.Status != SwapStatus.Complete).OrderByDescending(m => m.Date);
-            var requests = _dbContext.Swaps.Include(m => m.Sticker).ThenInclude(m => m.User).Include(m => m.User).Where(m => m.Sticker.User.Id == userId && m.Status != SwapStatus.Complete).OrderByDescending(m => m.Date);
+            var picks = _dbContext.Swaps.Include(m => m.Sticker).ThenInclude(m => m.User).Include(m => m.User).Where(m => m.User.Id == userId && m.Status != SwapStatus.Complete && m.Status != SwapStatus.Cancelled).OrderByDescending(m => m.Date);
+            var requests = _dbContext.Swaps.Include(m => m.Sticker).ThenInclude(m => m.User).Include(m => m.User).Where(m => m.Sticker.User.Id == userId && m.Status != SwapStatus.Complete && m.Status != SwapStatus.Cancelled).OrderByDescending(m => m.Date);
 
-            var pastPicks = _dbContext.Swaps.Include(m => m.Sticker).ThenInclude(m => m.User).Include(m => m.User).Where(m => m.User.Id == userId && m.Status == SwapStatus.Complete).OrderByDescending(m => m.Date);
-            var pastRequests = _dbContext.Swaps.Include(m => m.Sticker).ThenInclude(m => m.User).Include(m => m.User).Where(m => m.Sticker.User.Id == userId && m.Status == SwapStatus.Complete).OrderByDescending(m => m.Date);
+            var pastPicks = _dbContext.Swaps.Include(m => m.Sticker).ThenInclude(m => m.User).Include(m => m.User).Where(m => m.User.Id == userId && (m.Status == SwapStatus.Complete || m.Status == SwapStatus.Cancelled)).OrderByDescending(m => m.Date);
+            var pastRequests = _dbContext.Swaps.Include(m => m.Sticker).ThenInclude(m => m.User).Include(m => m.User).Where(m => m.Sticker.User.Id == userId && (m.Status == SwapStatus.Complete || m.Status == SwapStatus.Cancelled)).OrderByDescending(m => m.Date);
 
             swapsViewModel.ActivePicks = picks;
             swapsViewModel.ActiveRequests = requests;
@@ -46,7 +49,7 @@ namespace StickerSwap.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            var order = _dbContext.Swaps.Include(m => m.Sticker).ThenInclude(m => m.User).FirstOrDefault(m => m.Id == id);
+            var order = _dbContext.Swaps.Include(m => m.User).Include(m => m.Sticker).ThenInclude(m => m.User).FirstOrDefault(m => m.Id == id);
 
             if (order == null)
             {
@@ -72,10 +75,22 @@ namespace StickerSwap.Controllers
         public async Task<IActionResult> Create(SwapViewModel viewModel)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var product = _dbContext.Stickers.FirstOrDefault(m => m.Id == viewModel.StickerId);
+            var product = _dbContext.Stickers.Include(m => m.User).FirstOrDefault(m => m.Id == viewModel.StickerId);
             var user = _dbContext.Users.First(m => m.Id == userId);
 
-            user.Credits -= viewModel.Quantity;
+            var totalCredits = product.Credits * viewModel.Quantity;
+
+            if (totalCredits > user.Credits)
+            {
+                return BadRequest();
+            }
+
+            if (viewModel.Quantity < 0)
+            {
+                return BadRequest();
+            }
+
+            user.Credits -= totalCredits;
             product.Quantity -= viewModel.Quantity;
 
             var order = new Swap
@@ -85,13 +100,18 @@ namespace StickerSwap.Controllers
                 Sticker = product,
                 Status = SwapStatus.Processing,
                 Quantity = viewModel.Quantity,
-                Credits = viewModel.Quantity * product.Credits
+                Credits = totalCredits
             };
 
             _dbContext.Add(order);
             await _dbContext.SaveChangesAsync();
 
-            return View();
+            if (product.User.EnableEmail)
+            {
+                await _emailSender.SendEmailAsync(product.User.Email, "Sticker Swap Request!", $"The user {user.UserName} wants {viewModel.Quantity} of your sticker {product.Title}. Visit <a href='https://stickerswap.io'>Sticker Swap</a> to get their shipping information.");
+            }
+
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -127,7 +147,7 @@ namespace StickerSwap.Controllers
             // Only users that are part of this order can cancel it
             if (swap.Status == SwapStatus.Processing && swapStatus == SwapStatus.Cancelled)
             {
-                if (swap.User.Id != userId || swap.Sticker.User.Id != userId)
+                if (swap.User.Id != userId && swap.Sticker.User.Id != userId)
                 {
                     return BadRequest();
                 }
@@ -153,12 +173,34 @@ namespace StickerSwap.Controllers
 
             if (swapStatus == SwapStatus.Cancelled)
             {
+                var targetUser = userId == swap.User.Id ? swap.User : swap.Sticker.User;
+                var sourceUser = userId != swap.User.Id ? swap.User : swap.Sticker.User;
+
+                if (targetUser.EnableEmail)
+                {
+                    await _emailSender.SendEmailAsync(targetUser.Email, "Your Sticker Swap has been cancelled!", $"Your Sticker Swap been cancelled by {sourceUser.Email}. The quantity of stickers has been reset.");
+                }
+                
+
                 swap.User.Credits += swap.Credits;
-                swap.Sticker.Quantity += swap.Credits;
+                swap.Sticker.Quantity += swap.Quantity;
+            }
+
+            if (swapStatus == SwapStatus.Shipped)
+            {
+                if (swap.User.EnableEmail)
+                {
+                    await _emailSender.SendEmailAsync(swap.User.Email, "You sticker has been shipped!", $"Your sticker is on the way! Make sure to mark the swap complete when you get the sticker.");
+                }
             }
 
             if (swapStatus == SwapStatus.Complete)
             {
+                if (swap.Sticker.User.EnableEmail)
+                {
+                    await _emailSender.SendEmailAsync(swap.Sticker.User.Email, "Your Sticker Swap has completed!", $"Your Sticker Swap has completed! You just earned {swap.Credits} sticker credits!");
+                }
+
                 swap.Sticker.User.Credits += swap.Credits;
             }
 

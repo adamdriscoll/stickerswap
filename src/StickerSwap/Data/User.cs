@@ -15,6 +15,7 @@ namespace StickerSwap.Data
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Credits { get; set; }
+        public bool EnableEmail { get; set; }
         public ICollection<Swap> Swaps { get; set; }
         public ICollection<Sticker> Stickers { get; set; }
         public ICollection<Notification> Notification { get; set; }

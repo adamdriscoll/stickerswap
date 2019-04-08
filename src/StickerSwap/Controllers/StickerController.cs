@@ -138,12 +138,15 @@ namespace StickerSwap.Controllers
         [Route("{id}")]
         public IActionResult Index([FromRoute]int id)
         {
-            var product = _dbContext.Stickers.FirstOrDefault(m => m.Id == id);
+            var product = _dbContext.Stickers.Include(m => m.User).FirstOrDefault(m => m.Id == id);
 
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var user = _dbContext.Users.FirstOrDefault(m => m.Id == userId);
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var user = _dbContext.Users.FirstOrDefault(m => m.Id == userId);
 
-            ViewData["credits"] = user.Credits;
+                ViewData["credits"] = user.Credits;
+            }
 
             if (product == null)
             {

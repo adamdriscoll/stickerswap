@@ -13,6 +13,9 @@ using Microsoft.EntityFrameworkCore;
 using StickerSwap.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using StickerSwap.Services;
+using StickerSwap.Models;
 
 namespace StickerSwap
 {
@@ -38,9 +41,15 @@ namespace StickerSwap
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<User>()
+            services.AddDefaultIdentity<User>(config =>
+            {
+                config.SignIn.RequireConfirmedEmail = true;
+            })
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
