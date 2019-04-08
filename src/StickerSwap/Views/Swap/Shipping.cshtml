@@ -4,14 +4,16 @@
 }
 @model StickerSwap.Data.Swap
 
-<h1>Shipping for swap #@Model.Id</h1>
+<h1 class="display-4">Shipping for swap #@Model.Id</h1>
 
-First Name: @Model.User.FirstName
-Last Name: @Model.User.LastName
-Address: @Model.User.Address
-Country: @Model.User.Country
-State: @Model.User.State
-ZIP: @Model.User.ZipCode
+<ul class="list-group">
+    <li class="list-group-item">First Name: @Model.User.FirstName</li>
+    <li class="list-group-item">Last Name: @Model.User.LastName</li>
+    <li class="list-group-item">Address: @Model.User.Address</li>
+    <li class="list-group-item">Country: @Model.User.Country</li>
+    <li class="list-group-item">State: @Model.User.State</li>
+    <li class="list-group-item">ZIP: @Model.User.ZipCode</li>
+</ul>
 
 
 
