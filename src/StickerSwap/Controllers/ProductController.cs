@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -45,10 +46,18 @@ namespace StickerSwap.Controllers
                 Title = createProductViewModel.Title,
                 ProductType = createProductViewModel.ProductType,
                 Quantity = createProductViewModel.Quantity,
-                User = user
+                User = user,
+                BlobMediaType = createProductViewModel.Image.ContentType
             };
 
+            using (var memoryStream = new MemoryStream())
+            {
+                await createProductViewModel.Image.CopyToAsync(memoryStream);
+                product.Blob = memoryStream.ToArray();
+            }
+
             _dbContext.Add(product);
+
             await _dbContext.SaveChangesAsync();
 
             var productViewModel = new ProductViewModel
@@ -61,10 +70,38 @@ namespace StickerSwap.Controllers
             return View("Single", productViewModel);
         }
 
-        //[Route("{id}")]
-        //public IActionResult Index([FromRoute]int stickerId)
-        //{
+        [Route("{id}")]
+        public IActionResult Index([FromRoute]int id)
+        {
+            var product = _dbContext.Products.FirstOrDefault(m => m.Id == id);
 
-        //}
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var productViewModel = new ProductViewModel
+            {
+                ProductId = product.Id,
+                Title = product.Title,
+                Description = product.Description,
+                Quantity = product.Quantity
+            };
+
+            return View("Single", productViewModel);
+        }
+
+        [Route("image/{id}")]
+        public IActionResult Image([FromRoute]long id)
+        {
+            var media = _dbContext.Products.FirstOrDefault(m => m.Id == id);
+
+            if (media == null)
+            {
+                return NotFound();
+            }
+
+            return File(media.Blob, media.BlobMediaType);
+        }
     }
 }

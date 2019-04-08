@@ -16,5 +16,8 @@ namespace StickerSwap.Data
         public DateTime Created { get; set; }
         public int Quantity { get; set; }
         public int Views { get; set; }
+        public string BlobUri { get; set; }
+        public byte[] Blob { get; set; }
+        public string BlobMediaType { get; set; }
     }
 }

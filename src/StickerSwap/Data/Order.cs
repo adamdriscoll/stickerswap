@@ -10,7 +10,7 @@ namespace StickerSwap.Data
         public User User { get; set; }
         public DateTime OrderDate { get; set; }
         public OrderStatus Status { get; set; }
-        public ICollection<OrderItem> Items { get; set; }
-
+        public Product Product { get; set; }
+        public long Quantity { get; set; }
     }
 }

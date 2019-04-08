@@ -15,7 +15,7 @@ namespace StickerSwap.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -133,25 +133,6 @@ namespace StickerSwap.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("StickerSwap.Data.Media", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("AlternateText");
-
-                    b.Property<string>("BlobUri");
-
-                    b.Property<long>("ProductId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Media");
-                });
-
             modelBuilder.Entity("StickerSwap.Data.Notification", b =>
                 {
                     b.Property<long>("Id")
@@ -183,34 +164,21 @@ namespace StickerSwap.Data.Migrations
 
                     b.Property<DateTime>("OrderDate");
 
+                    b.Property<long?>("ProductId");
+
+                    b.Property<long>("Quantity");
+
                     b.Property<int>("Status");
 
                     b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProductId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("StickerSwap.Data.OrderItem", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("OrderId");
-
-                    b.Property<long?>("ProductId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("StickerSwap.Data.Product", b =>
@@ -218,6 +186,12 @@ namespace StickerSwap.Data.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<byte[]>("Blob");
+
+                    b.Property<string>("BlobMediaType");
+
+                    b.Property<string>("BlobUri");
 
                     b.Property<DateTime>("Created");
 
@@ -382,14 +356,6 @@ namespace StickerSwap.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("StickerSwap.Data.Media", b =>
-                {
-                    b.HasOne("StickerSwap.Data.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("StickerSwap.Data.Notification", b =>
                 {
                     b.HasOne("StickerSwap.Data.User", "User")
@@ -399,20 +365,13 @@ namespace StickerSwap.Data.Migrations
 
             modelBuilder.Entity("StickerSwap.Data.Order", b =>
                 {
-                    b.HasOne("StickerSwap.Data.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("StickerSwap.Data.OrderItem", b =>
-                {
-                    b.HasOne("StickerSwap.Data.Order", "Order")
-                        .WithMany("Items")
-                        .HasForeignKey("OrderId");
-
                     b.HasOne("StickerSwap.Data.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId");
+
+                    b.HasOne("StickerSwap.Data.User", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("StickerSwap.Data.Product", b =>

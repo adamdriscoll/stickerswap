@@ -1,0 +1,101 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+@model StickerSwap.Models.OrdersViewModel
+
+<h1>Active Picks</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Sticker</th>
+            <th>Status</th>
+            <th>Quantity</th>
+            <th>User</th>
+        </tr>
+    </thead>
+    @foreach (var item in Model.ActivePicks)
+    {
+        <tr>
+            <td>@item.OrderDate</td>
+            <td><a asp-action="Index" asp-controller="Product" asp-route-id="@item.Product.Id">@item.Product.Title</a></td>
+            <td>@item.Status</td>
+            <td>@item.Quantity</td>
+            <td>@item.Product.User.UserName</td>
+        </tr>
+    }
+</table>
+
+<h1>Active Requests</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Sticker</th>
+            <th>Status</th>
+            <th>Quantity</th>
+            <th>User</th>
+        </tr>
+    </thead>
+    @foreach (var item in Model.ActiveRequests)
+    {
+        <tr>
+            <td>@item.OrderDate</td>
+            <td><a asp-action="Index" asp-controller="Product" asp-route-id="@item.Product.Id">@item.Product.Title</a></td>
+            <td>@item.Status</td>
+            <td>@item.Quantity</td>
+            <td>@item.Product.User.UserName</td>
+        </tr>
+    }
+</table>
+
+<h1>Past Picks</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Sticker</th>
+            <th>Status</th>
+            <th>Quantity</th>
+            <th>User</th>
+        </tr>
+    </thead>
+    @foreach (var item in Model.PastPicks)
+    {
+        <tr>
+            <td>@item.OrderDate</td>
+            <td><a asp-action="Index" asp-controller="Product" asp-route-id="@item.Product.Id">@item.Product.Title</a></td>
+            <td>@item.Status</td>
+            <td>@item.Quantity</td>
+            <td>@item.Product.User.UserName</td>
+        </tr>
+    }
+</table>
+
+<h1>Past Requests</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Sticker</th>
+            <th>Status</th>
+            <th>Quantity</th>
+            <th>User</th>
+        </tr>
+    </thead>
+    @foreach (var item in Model.PastRequests)
+    {
+        <tr>
+            <td>@item.OrderDate</td>
+            <td><a asp-action="Index" asp-controller="Product" asp-route-id="@item.Product.Id">@item.Product.Title</a></td>
+            <td>@item.Status</td>
+            <td>@item.Quantity</td>
+            <td>@item.Product.User.UserName</td>
+        </tr>
+    }
+</table>

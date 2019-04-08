@@ -12,8 +12,6 @@ namespace StickerSwap.Data
 
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderItem> OrderItems { get; set; }
-        public DbSet<Media> Media { get; set; }
         public DbSet<Tag> Tag { get; set; }
         public DbSet<ProductTag> ProductTag { get; set; }
         public DbSet<Notification> Notification { get; set; }

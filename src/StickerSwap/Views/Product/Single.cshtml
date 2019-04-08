@@ -4,5 +4,25 @@
 }
 
 <h1>@Model.Title</h1>
+
+<img src="/sticker/image/@Model.ProductId" />
+
 <h2>@Model.Description</h2>
 <h3>@Model.Quantity</h3>
+
+<form method="post" asp-action="Create" asp-controller="Order">
+
+    <input type="hidden" value="@Model.ProductId" name="productId" />
+
+    <div class="form-group">
+        <label asp-for="Quantity" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="Quantity" class="form-control" />
+            <span asp-validation-for="Quantity" class="text-danger"></span>
+        </div>
+    </div>
+
+    <input type="submit" value="Share" class="btn btn-default" />
+
+
+</form>

@@ -1,8 +1,13 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@model StickerSwap.Models.HomeViewModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+<h1>New Stickers</h1>
+
+@foreach(var product in Model.NewProducts)
+{
+    <img src="sticker/image/@product.Id" />
+    <h2><a asp-action="Index" asp-controller="Product" asp-route-id="@product.Id">@product.Title</a> </h2>
+}
