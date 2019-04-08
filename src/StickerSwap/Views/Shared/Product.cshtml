@@ -1,0 +1,4 @@
+﻿@model StickerSwap.Data.Product
+
+<h1><a asp-action="Single" asp-controller="Product" asp-route-id="@Model.Id">@Model.Title</a></h1>
+<img src="/sticker/image/@Model.Id"/>

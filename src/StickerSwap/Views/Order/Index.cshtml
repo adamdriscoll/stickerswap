@@ -5,7 +5,7 @@
 @model StickerSwap.Models.OrdersViewModel
 
 <h1>Active Picks</h1>
-
+<h3>These are stickers that you have picked and are on their way.</h3>
 <table class="table">
     <thead>
         <tr>
@@ -14,21 +14,49 @@
             <th>Status</th>
             <th>Quantity</th>
             <th>User</th>
+            <th></th>
         </tr>
     </thead>
     @foreach (var item in Model.ActivePicks)
     {
-        <tr>
-            <td>@item.OrderDate</td>
-            <td><a asp-action="Index" asp-controller="Product" asp-route-id="@item.Product.Id">@item.Product.Title</a></td>
-            <td>@item.Status</td>
-            <td>@item.Quantity</td>
-            <td>@item.Product.User.UserName</td>
-        </tr>
+    <tr>
+        <td>@item.OrderDate</td>
+        <td><a asp-action="Index" asp-controller="Product" asp-route-id="@item.Product.Id">@item.Product.Title</a></td>
+        <td>@item.Status</td>
+        <td>@item.Quantity</td>
+        <td>@item.Product.User.UserName</td>
+        @if (item.Status == StickerSwap.Data.OrderStatus.Processing)
+        {
+            <td>
+                <form asp-action="UpdateStatus" asp-controller="Order" asp-route-id="@item.Id">
+                    <input type="hidden" name="orderStatus" value="@StickerSwap.Data.OrderStatus.Cancelled" />
+                    <input type="submit" class="btn btn-outline-danger" value="Cancel" />
+                </form>
+            </td>
+        }
+        else
+        {
+            <td></td>
+        }
+        @if (item.Status == StickerSwap.Data.OrderStatus.Shipped)
+        {
+            <td>
+                <form asp-action="UpdateStatus" asp-controller="Order" asp-route-id="@item.Id">
+                    <input type="hidden" name="orderStatus" value="@StickerSwap.Data.OrderStatus.Complete" />
+                    <input type="submit" class="btn btn-outline-danger" value="Received" />
+                </form>
+            </td>
+        }
+        else
+        {
+            <td></td>
+        }
+    </tr>
     }
 </table>
 
-<h1>Active Requests</h1>
+<h1>Active Shares</h1>
+<h3>These are stickers that others have picked from you. Send 'em away.</h3>
 
 <table class="table">
     <thead>
@@ -38,17 +66,41 @@
             <th>Status</th>
             <th>Quantity</th>
             <th>User</th>
+            <th></th>
+            <th></th>
         </tr>
     </thead>
     @foreach (var item in Model.ActiveRequests)
     {
-        <tr>
-            <td>@item.OrderDate</td>
-            <td><a asp-action="Index" asp-controller="Product" asp-route-id="@item.Product.Id">@item.Product.Title</a></td>
-            <td>@item.Status</td>
-            <td>@item.Quantity</td>
-            <td>@item.Product.User.UserName</td>
-        </tr>
+    <tr>
+        <td>@item.OrderDate</td>
+        <td><a asp-action="Index" asp-controller="Product" asp-route-id="@item.Product.Id">@item.Product.Title</a></td>
+        <td>@item.Status</td>
+        <td>@item.Quantity</td>
+        <td>@item.Product.User.UserName</td>
+        @if (item.Status == StickerSwap.Data.OrderStatus.Processing)
+        {
+            <td>
+                <form asp-action="UpdateStatus" asp-controller="Order" asp-route-id="@item.Id">
+                    <input type="hidden" name="orderStatus" value="@StickerSwap.Data.OrderStatus.Cancelled" />
+                    <input type="submit" class="btn btn-outline-danger" value="Cancel" />
+                </form>
+            </td>
+            <td>
+                <form asp-action="UpdateStatus" asp-controller="Order" asp-route-id="@item.Id">
+                    <input type="hidden" name="orderStatus" value="@StickerSwap.Data.OrderStatus.Shipped" />
+                    <input type="submit" class="btn btn-outline-primary" value="Shipped" />
+                </form>
+                <br/>
+                <a asp-action="Shipping" asp-controller="Order" asp-route-id="@item.Id">Shipping Information</a>
+            </td>
+        }
+        else
+        {
+            <td></td>
+            <td></td>
+        }
+    </tr>
     }
 </table>
 
@@ -76,7 +128,7 @@
     }
 </table>
 
-<h1>Past Requests</h1>
+<h1>Past Shares</h1>
 
 <table class="table">
     <thead>

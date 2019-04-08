@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewData["Title"] = "User";
+}
+@model UserProductViewModel
+
+<h1>Picks</h1>
+
+@foreach (var item in Model.Picks)
+{
+    <partial name="Product" model="@item" />
+}
+
+<h1>Shares</h1>
+
+@foreach (var item in Model.Shares)
+{
+    <partial name="Product" model="@item" />
+}

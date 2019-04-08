@@ -7,9 +7,9 @@ namespace StickerSwap.Data
 {
     public enum OrderStatus
     {
-        Draft,
         Processing,
         Shipped,
-        Complete
+        Complete,
+        Cancelled
     }
 }

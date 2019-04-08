@@ -38,6 +38,8 @@ namespace StickerSwap.Areas.Identity.Pages.Account.Manage
         [BindProperty]
         public InputModel Input { get; set; }
 
+        public int Credits { get; set; }
+
         public class InputModel
         {
             [Required]
@@ -62,6 +64,8 @@ namespace StickerSwap.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
+
+            Credits = user.Credits;
 
             Input = new InputModel
             {

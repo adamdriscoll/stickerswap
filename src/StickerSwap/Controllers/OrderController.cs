@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace StickerSwap.Controllers
 {
     [Authorize]
+    [Route("swap")]
     public class OrderController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
@@ -38,7 +39,34 @@ namespace StickerSwap.Controllers
             ordersViewModel.PastPicks = pastPicks;
             ordersViewModel.PastRequests = pastRequests;
 
-            return View(ordersViewModel);
+            return View("Index", ordersViewModel);
+        }
+
+        [Route("{id}/shipping")]
+        public IActionResult Shipping([FromRoute]long id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var order = _dbContext.Orders.Include(m => m.Product).ThenInclude(m => m.User).FirstOrDefault(m => m.Id == id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // Only can see address if processing
+            if (order.Status != OrderStatus.Processing)
+            {
+                return BadRequest();
+            }
+
+            // Only the shipper can see the address
+            if (order.Product.User.Id != userId)
+            {
+                return BadRequest();
+            }
+
+            return View(order);
         }
 
         [HttpPost]
@@ -65,5 +93,69 @@ namespace StickerSwap.Controllers
 
             return View();
         }
+
+        [HttpPost]
+        [Route("{id}/status")]
+        public async Task<IActionResult> UpdateStatus([FromRoute]long id, OrderStatus orderStatus)
+        {
+            var order = _dbContext.Orders.Include(m => m.User).Include(m => m.Product).ThenInclude(m => m.User).FirstOrDefault(m => m.Id == id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            // Can only transition to correct state
+            switch(order.Status)
+            {
+                case OrderStatus.Processing:
+                    if (orderStatus != OrderStatus.Cancelled && orderStatus != OrderStatus.Shipped)
+                    {
+                        return BadRequest();
+                    }
+                    break;
+                case OrderStatus.Shipped:
+                    if (orderStatus != OrderStatus.Complete)
+                    {
+                        return BadRequest();
+                    }
+                    break;
+            }
+
+            // Only users that are part of this order can cancel it
+            if (order.Status == OrderStatus.Processing && orderStatus == OrderStatus.Cancelled)
+            {
+                if (order.User.Id != userId || order.Product.User.Id != userId)
+                {
+                    return BadRequest();
+                }
+            }
+
+            // Only the product author can ship the item
+            if (order.Status == OrderStatus.Processing && orderStatus == OrderStatus.Shipped)
+            {
+                if (order.Product.User.Id != userId)
+                {
+                    return BadRequest();
+                }
+            }
+
+            // Only the order owner can complete the request
+            if (order.Status == OrderStatus.Shipped && orderStatus != OrderStatus.Complete)
+            {
+                if (order.User.Id != userId)
+                {
+                    return BadRequest();
+                }
+            }
+
+            order.Status = orderStatus;
+            await _dbContext.SaveChangesAsync();
+
+            return Index();
+        }
+
     }
 }
