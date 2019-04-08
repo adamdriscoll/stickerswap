@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace StickerSwap.Data
 {
-    public class Tag
+    public class StickerTag
     {
         public long Id { get; set; }
-        public string Name { get; set; }
-        public ICollection<StickerTag> StickerTags { get; set; }
+        public Sticker Sticker { get; set; }
+        public Tag Tag { get; set; }
     }
 }

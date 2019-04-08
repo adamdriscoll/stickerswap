@@ -3,11 +3,10 @@
 }
 @model StickerSwap.Models.HomeViewModel
 
+<partial name="SearchBox" model="null"/>
 
-<h1>New Stickers</h1>
+<hr />
 
-@foreach(var product in Model.NewProducts)
-{
-    <img src="sticker/image/@product.Id" />
-    <h2><a asp-action="Index" asp-controller="Product" asp-route-id="@product.Id">@product.Title</a> </h2>
-}
+<h1 class="display-4">New Stickers</h1>
+
+<partial name="StickerCollection" model="@Model.NewStickers" />

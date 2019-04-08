@@ -12,5 +12,11 @@ namespace StickerSwap.Controllers
         {
             return View();
         }
+
+        [Route("invite")]
+        public IActionResult Invite()
+        {
+            return View("InvitePage");
+        }
     }
 }

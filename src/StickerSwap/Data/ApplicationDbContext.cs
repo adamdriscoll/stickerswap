@@ -10,11 +10,12 @@ namespace StickerSwap.Data
         {
         }
 
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<Tag> Tag { get; set; }
-        public DbSet<ProductTag> ProductTag { get; set; }
-        public DbSet<Notification> Notification { get; set; }
+        public DbSet<Sticker> Stickers { get; set; }
+        public DbSet<Swap> Swaps { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<StickerTag> StickerTags { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Invite> Invites { get; set; }
         
     }
 }

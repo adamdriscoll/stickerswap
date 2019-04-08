@@ -1,0 +1,10 @@
+﻿@model IEnumerable<StickerSwap.Data.Sticker>
+
+<div class="row">
+    @foreach (var sticker in Model)
+    {
+        <div class="col col-lg-3 col-md-6 col-sm-12">
+            <partial name="Sticker" model="@sticker" />
+        </div>
+    }
+</div>

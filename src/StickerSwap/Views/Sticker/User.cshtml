@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewData["Title"] = "User";
+}
+@model UserStickerViewModel
+
+@if (Model.Picks.Any())
+{
+    <h1 class="display-4">Picks</h1>
+
+    <p class="lead">These are stickers that you've picked from others.</p>
+
+    <div class="row">
+        @foreach (var sticker in Model.Picks)
+        {
+            <div class="col col-lg-3 col-md-6 col-sm-12">
+                <partial name="Sticker" model="@sticker" />
+            </div>
+        }
+    </div>
+}
+
+@if (Model.Shares.Any())
+{
+    <h1 class="display-4">Shares</h1>
+
+    <p class="lead">These are stickers that you have shared with others.</p>
+
+    <div class="row">
+        @foreach (var sticker in Model.Shares)
+        {
+            <div class="col col-lg-3 col-md-6 col-sm-12">
+                <partial name="Sticker" model="@sticker" />
+            </div>
+        }
+    </div>
+
+}
+

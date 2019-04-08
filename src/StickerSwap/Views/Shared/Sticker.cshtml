@@ -1,0 +1,17 @@
+﻿@model StickerSwap.Data.Sticker
+
+    <div class="card text-center">
+        <div class="card-header">
+            @Model.Title
+        </div>
+        <img src="/sticker/image/@Model.Id" class="card-img-top mx-auto" alt="@Model.Title" style="width: 10rem; padding: 1rem" />
+        <div class="card-body">
+            <h5 class="card-title"></h5>
+            <p class="card-text">@Model.Description</p>
+            @Model.Height" x @Model.Width" - @Model.Credits Credit(s)
+        </div>
+        <div class="card-footer text-muted">
+            <a asp-action="Index" asp-controller="Sticker" asp-route-id="@Model.Id" class="btn btn-primary">View Sticker</a>
+        </div>
+    </div>
+

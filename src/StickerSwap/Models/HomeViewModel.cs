@@ -5,6 +5,6 @@ namespace StickerSwap.Models
 {
     public class HomeViewModel
     {
-        public IEnumerable<Product> NewProducts { get; set; }
+        public IEnumerable<Sticker> NewStickers { get; set; }
     }
 }

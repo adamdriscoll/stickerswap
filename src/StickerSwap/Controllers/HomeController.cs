@@ -20,11 +20,11 @@ namespace StickerSwap.Controllers
 
         public IActionResult Index()
         {
-            var newProducts = _dbContext.Products.OrderByDescending(m => m.Created).Take(10);
+            var newStickers = _dbContext.Stickers.OrderByDescending(m => m.Created).Take(10);
 
             var viewModel = new HomeViewModel
             {
-                NewProducts = newProducts
+                NewStickers = newStickers
             };
 
             return View(viewModel);

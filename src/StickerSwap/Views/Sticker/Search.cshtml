@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewData["Title"] = "Search";
+}
+@model StickerSwap.Models.SearchViewModel
+
+<partial name="SearchBox" model="@Model" />
+
+<hr/>
+
+@if (Model.Stickers != null)
+{
+    <h1 class="display-4">Results for @Model.SearchText</h1>
+
+    <partial name="StickerCollection" model="@Model.Stickers" />
+}
+

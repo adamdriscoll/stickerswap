@@ -1,17 +1,22 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = "My Account";
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
-<h4>@ViewData["Title"]</h4>
+<p class="lead">Sticker Credits: @Model.Credits</p>
 
-<h4>Sticker Credits: @Model.Credits</h4>
+@if (Model.Credits == 0)
+{
+    <div class="alert alert-danger" role="alert">
+        You're out of credits! You can earn more credits by <a asp-action="Create" asp-controller="Sticker">sharing stickers</a> or <a asp-action="Invite" asp-controller="About">inviting your friends</a>.
+    </div>
+}
 
 <partial name="_StatusMessage" for="StatusMessage" />
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
         <form id="profile-form" method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
@@ -34,11 +39,47 @@
                 }
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Input.PhoneNumber"></label>
-                <input asp-for="Input.PhoneNumber" class="form-control" />
-                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                <label asp-for="Input.FirstName"></label>
+                <input asp-for="Input.FirstName" class="form-control" />
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="Input.LastName"></label>
+                <input asp-for="Input.LastName" class="form-control" />
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+            </div>
+
+            <div class="alert alert-primary" role="alert">
+                Make sure your address is correct. This is where your stickers will be mailed!
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Address"></label>
+                <input asp-for="Input.Address" class="form-control" />
+                <span asp-validation-for="Input.Address" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Country"></label>
+                <input asp-for="Input.Country" class="form-control" />
+                <span asp-validation-for="Input.Country" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.State"></label>
+                <input asp-for="Input.State" class="form-control" />
+                <span asp-validation-for="Input.State" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Zip"></label>
+                <input asp-for="Input.Zip" class="form-control" />
+                <span asp-validation-for="Input.Zip" class="text-danger"></span>
+            </div>
+
             <button id="update-profile-button" type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>

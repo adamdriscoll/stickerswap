@@ -1,0 +1,179 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+@model StickerSwap.Models.SwapsViewModel
+
+@if (Model.Empty)
+{
+    <div class="alert alert-primary" role="alert">
+        You don't have any activity yet. Swap some stickers and stuff will show up here.
+    </div>
+}
+
+@if (Model.ActivePicks.Any())
+{
+    <h1 class="display-4">Active Picks</h1>
+    <p class="lead">These are stickers that you have picked and are on their way.</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Sticker</th>
+                <th>Status</th>
+                <th>Quantity</th>
+                <th>User</th>
+                <th></th>
+            </tr>
+        </thead>
+        @foreach (var item in Model.ActivePicks)
+        {
+            <tr>
+                <td>@item.Date</td>
+                <td><a asp-action="Index" asp-controller="Sticker" asp-route-id="@item.Sticker.Id">@item.Sticker.Title</a></td>
+                <td>@item.Status</td>
+                <td>@item.Quantity</td>
+                <td>@item.Sticker.User.UserName</td>
+                @if (item.Status == StickerSwap.Data.SwapStatus.Processing)
+                {
+                    <td>
+                        <form asp-action="UpdateStatus" asp-controller="Swap" asp-route-id="@item.Id">
+                            <input type="hidden" name="swapStatus" value="@StickerSwap.Data.SwapStatus.Cancelled" />
+                            <input type="submit" class="btn btn-outline-danger" value="Cancel" />
+                        </form>
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (item.Status == StickerSwap.Data.SwapStatus.Shipped)
+                {
+                    <td>
+                        <form asp-action="UpdateStatus" asp-controller="Swap" asp-route-id="@item.Id">
+                            <input type="hidden" name="swapStatus" value="@StickerSwap.Data.SwapStatus.Complete" />
+                            <input type="submit" class="btn btn-outline-danger" value="Received" />
+                        </form>
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+            </tr>
+        }
+    </table>
+}
+
+@if (Model.ActiveRequests.Any())
+{
+    <h1 class="display-4">Active Shares</h1>
+    <p class="lead">These are stickers that others have picked from you. Send 'em away.</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Sticker</th>
+                <th>Status</th>
+                <th>Quantity</th>
+                <th>User</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        @foreach (var item in Model.ActiveRequests)
+        {
+            <tr>
+                <td>@item.Date</td>
+                <td><a asp-action="Index" asp-controller="Sticker" asp-route-id="@item.Sticker.Id">@item.Sticker.Title</a></td>
+                <td>@item.Status</td>
+                <td>@item.Quantity</td>
+                <td>@item.Sticker.User.UserName</td>
+                @if (item.Status == StickerSwap.Data.SwapStatus.Processing)
+                {
+                    <td>
+                        <form asp-action="UpdateStatus" asp-controller="Swap" asp-route-id="@item.Id">
+                            <input type="hidden" name="swapStatus" value="@StickerSwap.Data.SwapStatus.Cancelled" />
+                            <input type="submit" class="btn btn-outline-danger" value="Cancel" />
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-action="UpdateStatus" asp-controller="Swap" asp-route-id="@item.Id">
+                            <input type="hidden" name="swapStatus" value="@StickerSwap.Data.SwapStatus.Shipped" />
+                            <input type="submit" class="btn btn-outline-primary" value="Shipped" />
+                        </form>
+                        <br />
+                        <a asp-action="Shipping" asp-controller="Swap" asp-route-id="@item.Id">Shipping Information</a>
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                    <td></td>
+                }
+            </tr>
+        }
+    </table>
+
+}
+
+@if (Model.PastPicks.Any())
+{
+    <h1 class="display-4">Past Picks</h1>
+
+    <p class="lead">These are stickers that you picked in the past.</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Sticker</th>
+                <th>Status</th>
+                <th>Quantity</th>
+                <th>User</th>
+            </tr>
+        </thead>
+        @foreach (var item in Model.PastPicks)
+        {
+            <tr>
+                <td>@item.Date</td>
+                <td><a asp-action="Index" asp-controller="Sticker" asp-route-id="@item.Sticker.Id">@item.Sticker.Title</a></td>
+                <td>@item.Status</td>
+                <td>@item.Quantity</td>
+                <td>@item.Sticker.User.UserName</td>
+            </tr>
+        }
+    </table>
+}
+
+@if (Model.PastRequests.Any())
+{
+    <h1 class="display-4">Past Shares</h1>
+
+    <p class="lead">These are stickers you've shared in the past.</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Sticker</th>
+                <th>Status</th>
+                <th>Quantity</th>
+                <th>User</th>
+            </tr>
+        </thead>
+        @foreach (var item in Model.PastRequests)
+        {
+            <tr>
+                <td>@item.Date</td>
+                <td><a asp-action="Index" asp-controller="Product" asp-route-id="@item.Sticker.Id">@item.Sticker.Title</a></td>
+                <td>@item.Status</td>
+                <td>@item.Quantity</td>
+                <td>@item.Sticker.User.UserName</td>
+            </tr>
+        }
+    </table>
+}
+
+
