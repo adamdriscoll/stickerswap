@@ -25,6 +25,11 @@ namespace StickerSwap.Controllers
         [Authorize]
         public async Task<IActionResult> Post(Invite invite)
         {
+            if (_dbContext.Invites.Any(m => m.EmailAddress == invite.EmailAddress))
+            {
+                return BadRequest();
+            }
+
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var user = _dbContext.Users.FirstOrDefault(m => m.Id == userId);
             invite.Key = Guid.NewGuid().ToString().Replace("-", string.Empty);

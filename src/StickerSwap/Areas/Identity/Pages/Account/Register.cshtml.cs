@@ -89,6 +89,12 @@ namespace StickerSwap.Areas.Identity.Pages.Account
                     }
                 }
 
+                if (_applicationDbContext.Users.Any(m => m.Email == Input.Email))
+                {
+                    ModelState.AddModelError(string.Empty, "An account with that email address has already been registered");
+                    return Page();
+                }
+
                 var user = new User { UserName = Input.UserName, Email = Input.Email, EnableEmail = true };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
