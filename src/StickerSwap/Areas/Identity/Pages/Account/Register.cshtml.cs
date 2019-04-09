@@ -84,7 +84,7 @@ namespace StickerSwap.Areas.Identity.Pages.Account
                     var invite = _applicationDbContext.Invites.Include(m => m.User).FirstOrDefault(m => m.Key == Input.ReferralCode);
                     if (invite != null)
                     {
-                        invite.User.Credits += 5;
+                        invite.User.Credits += 2;
                         await _applicationDbContext.SaveChangesAsync();
                     }
                 }

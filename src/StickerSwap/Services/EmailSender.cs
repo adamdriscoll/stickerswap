@@ -29,7 +29,7 @@ namespace StickerSwap.Services
                 From = new EmailAddress("noreply@stickerswap.io", "Sticker Swap"),
                 Subject = subject,
                 PlainTextContent = message,
-                HtmlContent = message
+                HtmlContent = HtmlTemplate.MakeBody(message)
             };
             msg.AddTo(new EmailAddress(email));
 
