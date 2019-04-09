@@ -8,6 +8,7 @@
 
     <div class="jumbotron">
         <h1 class="display-4">@Model.Title</h1>
+        <p class="lead">Shared by: @Model.User.UserName</p>
         <img src="/sticker/image/@Model.Id" class="rounded mx-auto d-block border" style="width: 18em" />
         <p class="lead">@Model.Description</p>
         <p class="lead">@Model.Height" x @Model.Width"</p>
