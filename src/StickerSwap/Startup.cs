@@ -38,6 +38,14 @@ namespace StickerSwap
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            var dbOptions = optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")).Options;
+
+            using(var context = new ApplicationDbContext(dbOptions))
+            {
+                context.Database.Migrate();
+            }
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
