@@ -76,6 +76,36 @@ namespace StickerSwap.Controllers
                 return NotFound();
             }
 
+            if (string.IsNullOrEmpty(viewModel.Title))
+            {
+                return BadRequest();
+            }
+
+            if (string.IsNullOrEmpty(viewModel.Description))
+            {
+                return BadRequest();
+            }
+
+            if (viewModel.Height <= 0)
+            {
+                return BadRequest();
+            }
+
+            if (viewModel.Width <= 0)
+            {
+                return BadRequest();
+            }
+
+            if (viewModel.Quantity <= 0)
+            {
+                return BadRequest();
+            }
+
+            if (viewModel.Credits <= 0)
+            {
+                return BadRequest();
+            }
+
             sticker.Height = viewModel.Height;
             sticker.Width = viewModel.Width;
             sticker.Description = viewModel.Description;
@@ -112,6 +142,36 @@ namespace StickerSwap.Controllers
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var user = _dbContext.Users.First(m => m.Id == userId);
+
+            if (string.IsNullOrEmpty(viewModel.Title))
+            {
+                return BadRequest();
+            }
+
+            if (string.IsNullOrEmpty(viewModel.Description))
+            {
+                return BadRequest();
+            }
+
+            if (viewModel.Height <= 0)
+            {
+                return BadRequest();
+            }
+
+            if (viewModel.Width <= 0)
+            {
+                return BadRequest();
+            }
+
+            if (viewModel.Quantity <= 0)
+            {
+                return BadRequest();
+            }
+
+            if (viewModel.Credits <= 0)
+            {
+                return BadRequest();
+            }
 
             var product = new Sticker
             {

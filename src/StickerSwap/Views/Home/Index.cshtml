@@ -3,10 +3,14 @@
 }
 @model StickerSwap.Models.HomeViewModel
 
-<partial name="SearchBox" model="null"/>
+<partial name="SearchBox" model="null" />
 
 <hr />
 
 <h1 class="display-4">New Stickers</h1>
 
 <partial name="StickerCollection" model="@Model.NewStickers" />
+
+<h1 class="display-4">Recently Swapped Stickers</h1>
+
+<partial name="StickerCollection" model="@Model.RecentSwaps" />
