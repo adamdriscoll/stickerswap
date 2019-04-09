@@ -59,6 +59,9 @@ namespace StickerSwap
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
+            services.AddResponseCompression();
+            services.AddResponseCaching();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
