@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StickerSwap.Data;
 using StickerSwap.Models;
+using SixLabors.ImageSharp.Processing;
+
 
 namespace StickerSwap.Controllers
 {
@@ -90,6 +92,8 @@ namespace StickerSwap.Controllers
                     await viewModel.Image.CopyToAsync(memoryStream);
                     sticker.Blob = memoryStream.ToArray();
                 }
+
+                ResizeImage(sticker);
             }
 
             await _dbContext.SaveChangesAsync();
@@ -126,6 +130,8 @@ namespace StickerSwap.Controllers
             {
                 await viewModel.Image.CopyToAsync(memoryStream);
                 product.Blob = memoryStream.ToArray();
+
+                ResizeImage(product);
             }
 
             _dbContext.Add(product);
@@ -133,6 +139,25 @@ namespace StickerSwap.Controllers
             await _dbContext.SaveChangesAsync();
 
             return RedirectToAction("Index", new { id = product.Id });
+        }
+
+        private void ResizeImage(Sticker sticker)
+        {
+            using (var image = SixLabors.ImageSharp.Image.Load(sticker.Blob))
+            {
+                var size = 500f * 500f;
+                var width = Math.Sqrt(size * (image.Width / (float)image.Height));
+                var height = size / width;
+
+                image.Mutate(x => x.Resize((int)width, (int)height));
+                using (var stream = new MemoryStream())
+                {
+                    var encoder = new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder();
+                    image.Save(stream, encoder);
+                    sticker.Blob = stream.ToArray();
+                    sticker.BlobMediaType = "image/png";
+                }
+            }
         }
 
         [Route("{id}")]
