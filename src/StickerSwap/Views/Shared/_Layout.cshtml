@@ -26,7 +26,7 @@
                     <img src="~/imgs/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
                     Sticker Swap
                 </a>
-                
+
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -78,6 +78,16 @@
         </script>
     </environment>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-8902901-13"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-8902901-13');
+    </script>
+
 
     @RenderSection("Scripts", required: false)
 </body>
