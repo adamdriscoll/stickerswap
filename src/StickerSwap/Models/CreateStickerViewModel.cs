@@ -33,9 +33,8 @@ namespace StickerSwap.Models
         [Display(Name = "Width (inches)")]
         public float Width { get; set; }
 
-        //[Required]
-        //[Display(Name = "Tags")]
-        //public string[] Tags { get; set; }
+        [Display(Name = "Tags")]
+        public string Tags { get; set; }
 
         [Required]
         [Display(Name = "Image")]

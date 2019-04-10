@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StickerSwap.Data;
 using StickerSwap.Models;
 
@@ -20,8 +21,8 @@ namespace StickerSwap.Controllers
 
         public IActionResult Index()
         {
-            var newStickers = _dbContext.Stickers.OrderByDescending(m => m.Created).Take(10);
-            var recentlySwapped = _dbContext.Swaps.OrderByDescending(m => m.Date).GroupBy(m => m.Sticker).Take(10).Select(m => m.Key);
+            var newStickers = _dbContext.Stickers.Include(m => m.StickerTags).ThenInclude(m => m.Tag).OrderByDescending(m => m.Created).Take(10);
+            var recentlySwapped = _dbContext.Swaps.OrderByDescending(m => m.Date).GroupBy(m => m.Sticker).Take(10).Select(m => m.Key).Include(m => m.StickerTags).ThenInclude(m => m.Tag);
 
             var viewModel = new HomeViewModel
             {

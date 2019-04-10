@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using StickerSwap.Data;
 using StickerSwap.Models;
 using SixLabors.ImageSharp.Processing;
-
+using System.Collections.Generic;
 
 namespace StickerSwap.Controllers
 {
@@ -37,7 +37,7 @@ namespace StickerSwap.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            var sticker = _dbContext.Stickers.FirstOrDefault(m => m.User.Id == userId && m.Id == id);
+            var sticker = _dbContext.Stickers.Include(m => m.StickerTags).ThenInclude(m => m.Tag).FirstOrDefault(m => m.User.Id == userId && m.Id == id);
 
             if (sticker == null)
             {
@@ -52,7 +52,8 @@ namespace StickerSwap.Controllers
                 Height = sticker.Height,
                 Width = sticker.Width,
                 Quantity = sticker.Quantity,
-                Title = sticker.Title
+                Title = sticker.Title,
+                Tags = sticker.StickerTags.Select(m => m.Tag.Name).Aggregate((x,y) => x + "," + y)
             };
 
             return View("Edit", viewModel);
@@ -69,7 +70,7 @@ namespace StickerSwap.Controllers
             }
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var sticker = _dbContext.Stickers.FirstOrDefault(m => m.Id == id && m.User.Id == userId);
+            var sticker = _dbContext.Stickers.Include(m => m.StickerTags).ThenInclude(m => m.Tag).FirstOrDefault(m => m.Id == id && m.User.Id == userId);
 
             if (sticker == null)
             {
@@ -106,6 +107,23 @@ namespace StickerSwap.Controllers
                 return BadRequest();
             }
 
+            var tags = viewModel.Tags.Split(',').Select(m => m.ToLower());
+
+            var existingTags = _dbContext.Tags.Where(m => tags.Contains(m.Name));
+            var newTags = new List<Tag>();
+            foreach (var tag in tags.Where(m => !existingTags.Any(x => x.Name.Equals(m))))
+            {
+                var newTag = new Tag
+                {
+                    Name = tag
+                };
+
+                newTags.Add(newTag);
+                _dbContext.Add(newTag);
+            }
+
+            var allTags = existingTags.Concat(newTags);
+
             sticker.Height = viewModel.Height;
             sticker.Width = viewModel.Width;
             sticker.Description = viewModel.Description;
@@ -125,6 +143,19 @@ namespace StickerSwap.Controllers
 
                 ResizeImage(sticker);
             }
+
+            _dbContext.StickerTags.RemoveRange(sticker.StickerTags);
+
+            foreach (var tag in allTags)
+            {
+                var stickerTag = new StickerTag
+                {
+                    Tag = tag,
+                    Sticker = sticker
+                };
+                _dbContext.Add(stickerTag);
+            }
+
 
             await _dbContext.SaveChangesAsync();
 
@@ -173,6 +204,23 @@ namespace StickerSwap.Controllers
                 return BadRequest();
             }
 
+            var tags = viewModel.Tags.Split(',').Select(m => m.ToLower());
+
+            var existingTags = _dbContext.Tags.Where(m => tags.Contains(m.Name));
+            var newTags = new List<Tag>();
+            foreach(var tag in tags.Where(m => !existingTags.Any(x => x.Name.Equals(m))))
+            {
+                var newTag = new Tag
+                {
+                    Name = tag
+                };
+
+                newTags.Add(newTag);
+                _dbContext.Add(newTag);
+            }
+
+            var allTags = existingTags.Concat(newTags);
+
             var product = new Sticker
             {
                 Created = DateTime.UtcNow,
@@ -195,6 +243,16 @@ namespace StickerSwap.Controllers
             }
 
             _dbContext.Add(product);
+
+            foreach (var tag in allTags)
+            {
+                var stickerTag = new StickerTag
+                {
+                    Tag = tag,
+                    Sticker = product
+                };
+                _dbContext.Add(stickerTag);
+            }
 
             await _dbContext.SaveChangesAsync();
 
@@ -223,7 +281,7 @@ namespace StickerSwap.Controllers
         [Route("{id}")]
         public IActionResult Index([FromRoute]int id)
         {
-            var product = _dbContext.Stickers.Include(m => m.User).FirstOrDefault(m => m.Id == id);
+            var product = _dbContext.Stickers.Include(m => m.User).Include(m => m.StickerTags).ThenInclude(m => m.Tag).FirstOrDefault(m => m.Id == id);
 
             if (User.Identity.IsAuthenticated)
             {
@@ -257,7 +315,8 @@ namespace StickerSwap.Controllers
         [Route("user/{id}")]
         public IActionResult UserSticker([FromRoute]string id)
         {
-            var user = _dbContext.Users.Include(m => m.Stickers).Include(m => m.Swaps).ThenInclude(m => m.Sticker).FirstOrDefault(m => m.Id == id);
+            var user = _dbContext.Users.Include(m => m.Stickers)
+                .Include(m => m.Swaps).ThenInclude(m => m.Sticker).ThenInclude(m => m.StickerTags).ThenInclude(m => m.Tag).FirstOrDefault(m => m.Id == id);
 
             if (user == null)
             {
@@ -267,7 +326,7 @@ namespace StickerSwap.Controllers
             var viewModel = new UserStickerViewModel
             {
                 Picks = user.Swaps.Select(m => m.Sticker),
-                Shares = user.Stickers
+                Shares = _dbContext.Stickers.Where(m => m.User == user).Include(m => m.StickerTags).ThenInclude(m => m.Tag)
             };
 
             return View("User", viewModel);
@@ -277,7 +336,7 @@ namespace StickerSwap.Controllers
         public IActionResult UserSticker()
         {
             var id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var user = _dbContext.Users.Include(m => m.Stickers).Include(m => m.Swaps).ThenInclude(m => m.Sticker).FirstOrDefault(m => m.Id == id);
+            var user = _dbContext.Users.Include(m => m.Swaps).ThenInclude(m => m.Sticker).ThenInclude(m => m.StickerTags).ThenInclude(m => m.Tag).FirstOrDefault(m => m.Id == id);
 
             if (user == null)
             {
@@ -287,7 +346,7 @@ namespace StickerSwap.Controllers
             var viewModel = new UserStickerViewModel
             {
                 Picks = user.Swaps.Select(m => m.Sticker),
-                Shares = user.Stickers
+                Shares = _dbContext.Stickers.Where(m => m.User == user).Include(m => m.StickerTags).ThenInclude(m => m.Tag)
             };
 
             return View("User", viewModel);
@@ -296,12 +355,12 @@ namespace StickerSwap.Controllers
         [Route("search")]
         public IActionResult Search(SearchViewModel searchViewModel)
         {
-            var stickerCount = _dbContext.Stickers.Count(m => m.Title.Contains(searchViewModel.SearchText) || m.Description.Contains(searchViewModel.SearchText));
+            var stickerCount = _dbContext.Stickers.Include(m => m.StickerTags).ThenInclude(m => m.Tag).Count(m => m.Title.Contains(searchViewModel.SearchText) || m.Description.Contains(searchViewModel.SearchText) || m.StickerTags.Any(x => x.Tag.Name.Contains(searchViewModel.SearchText)));
 
             var take = 20;
             var skip = 20 * searchViewModel.Page;
 
-            var stickers = _dbContext.Stickers.Where(m => m.Title.Contains(searchViewModel.SearchText) || m.Description.Contains(searchViewModel.SearchText)).OrderByDescending(m => m.Created).Skip(skip).Take(take);
+            var stickers = _dbContext.Stickers.Include(m => m.StickerTags).ThenInclude(m => m.Tag).Where(m => m.Title.Contains(searchViewModel.SearchText) || m.Description.Contains(searchViewModel.SearchText) || m.StickerTags.Any(x => x.Tag.Name.Contains(searchViewModel.SearchText))).OrderByDescending(m => m.Created).Skip(skip).Take(take);
 
             searchViewModel.NumberOfPages = (stickerCount / take) + 1;
             searchViewModel.Stickers = stickers;
