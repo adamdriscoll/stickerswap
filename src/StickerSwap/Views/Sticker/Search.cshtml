@@ -6,7 +6,7 @@
 
 <partial name="SearchBox" model="@Model" />
 
-<hr/>
+<hr />
 
 @if (Model.Stickers != null)
 {
@@ -15,3 +15,27 @@
     <partial name="StickerCollection" model="@Model.Stickers" />
 }
 
+@if (Model.NumberOfPages > 1)
+{
+    <div class="row">
+        <div class="col offset-6 col-3">
+            <ul class="pagination">
+                @if (Model.Page != 0)
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Search" asp-controller="Sticker" asp-route-SearchText="@Model.SearchText" asp-route-Page="@(Model.Page - 1)">Previous</a></li>
+                }
+
+                @for (var i = 0; i < Model.NumberOfPages; i++)
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Search" asp-controller="Sticker" asp-route-SearchText="@Model.SearchText" asp-route-Page="@i">@(i + 1)</a></li>
+                }
+
+                @if (Model.Page + 1 < Model.NumberOfPages)
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Search" asp-controller="Sticker" asp-route-SearchText="@Model.SearchText" asp-route-Page="@(Model.Page + 1)">Next</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+
+}

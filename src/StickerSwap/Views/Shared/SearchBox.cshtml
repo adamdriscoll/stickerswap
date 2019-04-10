@@ -1,6 +1,6 @@
 ﻿@model StickerSwap.Models.SearchViewModel
 
-    <form method="post" asp-action="Search" asp-controller="Sticker" class="form-inline">
+    <form method="get" asp-action="Search" asp-controller="Sticker" class="form-inline">
 
         <div class="form-group mx-sm-3 mb-2">
             <input asp-for="SearchText" class="form-control" placeholder="Find Stickers!" />

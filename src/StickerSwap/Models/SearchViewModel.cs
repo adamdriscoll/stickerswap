@@ -10,5 +10,6 @@ namespace StickerSwap.Models
         public string SearchText { get; set; }
         public IEnumerable<Sticker> Stickers { get; set; }
         public int Page { get; set; }
+        public int NumberOfPages { get; set; }
     }
 }

@@ -296,10 +296,14 @@ namespace StickerSwap.Controllers
         [Route("search")]
         public IActionResult Search(SearchViewModel searchViewModel)
         {
+            var stickerCount = _dbContext.Stickers.Count(m => m.Title.Contains(searchViewModel.SearchText) || m.Description.Contains(searchViewModel.SearchText));
+
             var take = 20;
             var skip = 20 * searchViewModel.Page;
+
             var stickers = _dbContext.Stickers.Where(m => m.Title.Contains(searchViewModel.SearchText) || m.Description.Contains(searchViewModel.SearchText)).OrderByDescending(m => m.Created).Skip(skip).Take(take);
 
+            searchViewModel.NumberOfPages = (stickerCount / take) + 1;
             searchViewModel.Stickers = stickers;
 
             return View(searchViewModel);
