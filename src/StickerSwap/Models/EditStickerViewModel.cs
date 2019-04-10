@@ -36,9 +36,8 @@ namespace StickerSwap.Models
         [Range(1, 10)]
         public int Credits { get; set; }
 
-        //[Required]
-        //[Display(Name = "Tags")]
-        //public string[] Tags { get; set; }
+        [Display(Name = "Tags")]
+        public string Tags { get; set; }
 
         [Display(Name = "Image")]
         public IFormFile Image { get; set; }

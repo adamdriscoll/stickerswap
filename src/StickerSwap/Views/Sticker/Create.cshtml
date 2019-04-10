@@ -4,6 +4,32 @@
 }
 @model StickerSwap.Models.CreateStickerViewModel
 
+@section Scripts {
+    <script src="~/js/typeahead.bundle.min.js"></script>
+    <script src="~/js/bootstrap-tokenfield.min.js"></script>
+    <script>
+var engine = new Bloodhound({
+  local: [{value: 'red'}, {value: 'blue'}, {value: 'green'} , {value: 'yellow'}, {value: 'violet'}, {value: 'brown'}, {value: 'purple'}, {value: 'black'}, {value: 'white'}],
+  datumTokenizer: function(d) {
+    return Bloodhound.tokenizers.whitespace(d.value);
+  },
+  queryTokenizer: Bloodhound.tokenizers.whitespace
+});
+
+engine.initialize();
+
+$('#tags').tokenfield({
+  typeahead: [null, { source: engine.ttAdapter() }]
+});
+    </script>
+}
+
+@section Stylesheets  {
+    <link rel="stylesheet" href="~/css/tokenfield-typeahead.min.css">
+    <link rel="stylesheet" href="~/css/bootstrap-tokenfield.min.css">
+}
+
+
 <div class="container">
     <div class="card">
         <div class="card-header">
@@ -29,7 +55,7 @@
                         <span asp-validation-for="Description" class="text-danger"></span>
                         <small class="form-text text-muted">Tell us a little about your sticker. Does it like long walks on the beach?</small>
                     </div>
-                </div>                
+                </div>
 
                 <div class="form-group">
                     <label asp-for="Height" class="col-md-2 control-label"></label>
@@ -74,9 +100,14 @@
                     <small class="form-text text-muted">A picture is worth a thousand words. </small>
                 </div>
 
+                <div class="form-group">
+                    <label asp-for="Tags" class="control-label"></label>
+                    <input asp-for="Tags" class="typeahead" id="tags"/>
+                    <span asp-validation-for="Tags" class="text-danger"></span>
+                    <small class="form-text text-muted">Some tag bling makes it easier to find your sticker.</small>
+                </div>
+
                 <input type="submit" value="Share" class="btn btn-default" />
-
-
             </form>
         </div>
     </div>

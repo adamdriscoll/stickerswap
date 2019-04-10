@@ -4,6 +4,25 @@
 }
 @model StickerSwap.Models.EditStickerViewModel
 
+@section Scripts {
+    <script src="~/js/bootstrap-tokenfield.min.js"></script>
+    <script>
+        $('#tags').tokenfield({
+          autocomplete: {
+            source: ['red','blue','green','yellow','violet','brown','purple','black','white'],
+            delay: 100
+          },
+          showAutocompleteOnFocus: true
+        })
+    </script>
+}
+
+@section Stylesheets  {
+    <link rel="stylesheet" href="~/css/tokenfield-typeahead.min.css">
+    <link rel="stylesheet" href="~/css/bootstrap-tokenfield.min.css">
+}
+
+
 <div class="container">
     <div class="card">
         <div class="card-header">
@@ -74,9 +93,14 @@
                     <small class="form-text text-muted">A picture is worth a thousand words. </small>
                 </div>
 
+                <div class="form-group">
+                    <label asp-for="Tags" class="control-label"></label>
+                    <input asp-for="Tags" class="form-control" id="tags" />
+                    <span asp-validation-for="Tags" class="text-danger"></span>
+                    <small class="form-text text-muted">Some tag bling makes it easier to find your sticker.</small>
+                </div>
+
                 <input type="submit" value="Update" class="btn btn-default" />
-
-
             </form>
         </div>
     </div>
