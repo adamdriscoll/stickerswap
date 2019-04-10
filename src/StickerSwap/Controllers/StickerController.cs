@@ -44,6 +44,12 @@ namespace StickerSwap.Controllers
                 return NotFound();
             }
 
+            var tags = string.Empty;
+            if (sticker.StickerTags.Any())
+            {
+                tags = sticker.StickerTags.Select(m => m.Tag.Name).Aggregate((x, y) => x + "," + y);
+            }
+
             var viewModel = new EditStickerViewModel
             {
                 Id = sticker.Id,
@@ -53,7 +59,7 @@ namespace StickerSwap.Controllers
                 Width = sticker.Width,
                 Quantity = sticker.Quantity,
                 Title = sticker.Title,
-                Tags = sticker.StickerTags.Select(m => m.Tag.Name).Aggregate((x,y) => x + "," + y)
+                Tags = tags
             };
 
             return View("Edit", viewModel);
