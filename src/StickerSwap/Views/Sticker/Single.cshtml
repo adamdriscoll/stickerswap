@@ -12,48 +12,52 @@
         <img src="/sticker/image/@Model.Id" class="rounded mx-auto d-block border" style="width: 18em" />
         <p class="lead">@Model.Description</p>
         <p class="lead">@Model.Height" x @Model.Width"</p>
+        @foreach (var tag in Model.StickerTags.Select(m => m.Tag))
+        {
+            <span class="badge badge-primary">@tag.Name</span>
+        }
         <hr class="my-4">
         <p>@Model.Quantity Available for @Model.Credits credit(s) a piece.</p>
         <hr class="my-4">
 
-    @if (!User.Identity.IsAuthenticated)
-    {
-    <div class="alert alert-danger" role="alert">
-        You need to <a asp-area="Identity" asp-page="/Account/Register">sign up for Sticker Swap</a> to get stickers.
-    </div>
-    }
-    else if (Model.User.Id == SignInManager.UserManager.GetUserId(User))
-    {
-        <div class="alert alert-primary" role="alert">
-            This is your sticker!
-        </div>
-
-        <a asp-controller="Sticker" asp-action="Update" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-    }
-    else if ((int)ViewData["credits"] > 0)
-    {
-        <span>You currently have @ViewData["credits"] credits. You can get up to @((int)ViewData["credits"] / Model.Credits) of these stickers.</span>
-
-        <form method="post" asp-action="Create" asp-controller="Swap" class="form-inline" style="padding-top:10px">
-
-            <input type="hidden" value="@Model.Id" name="stickerId" />
-
-            <div class="form-group mx-sm-3 mb-2">
-                <label asp-for="Quantity" class="control-label" style="padding-right: 10px"></label>
-                <input name="Quantity" type="number" value="0" class="form-control" min="0" max="@((int)ViewData["credits"] / Model.Credits)" />
-                <span asp-validation-for="Quantity" class="text-danger"></span>
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <div class="alert alert-danger" role="alert">
+                You need to <a asp-area="Identity" asp-page="/Account/Register">sign up for Sticker Swap</a> to get stickers.
+            </div>
+        }
+        else if (Model.User.Id == SignInManager.UserManager.GetUserId(User))
+        {
+            <div class="alert alert-primary" role="alert">
+                This is your sticker!
             </div>
 
-            <input type="submit" value="Pick" class="btn btn-primary" />
+            <a asp-controller="Sticker" asp-action="Update" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        }
+        else if ((int)ViewData["credits"] > 0)
+        {
+            <span>You currently have @ViewData["credits"] credits. You can get up to @((int)ViewData["credits"] / Model.Credits) of these stickers.</span>
 
-        </form>
+            <form method="post" asp-action="Create" asp-controller="Swap" class="form-inline" style="padding-top:10px">
 
-    }
-    else
-    {
-        <div class="alert alert-danger" role="alert">
-            You're out of credits! You can earn more credits by <a asp-action="Create" asp-controller="Sticker">sharing stickers</a> or <a asp-action="Invite" asp-controller="About">inviting your friends</a>.
-        </div>
-    }
+                <input type="hidden" value="@Model.Id" name="stickerId" />
+
+                <div class="form-group mx-sm-3 mb-2">
+                    <label asp-for="Quantity" class="control-label" style="padding-right: 10px"></label>
+                    <input name="Quantity" type="number" value="0" class="form-control" min="0" max="@((int)ViewData["credits"] / Model.Credits)" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+
+                <input type="submit" value="Pick" class="btn btn-primary" />
+
+            </form>
+
+        }
+        else
+        {
+            <div class="alert alert-danger" role="alert">
+                You're out of credits! You can earn more credits by <a asp-action="Create" asp-controller="Sticker">sharing stickers</a> or <a asp-action="Invite" asp-controller="About">inviting your friends</a>.
+            </div>
+        }
 
     </div>
