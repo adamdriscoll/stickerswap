@@ -9,11 +9,15 @@
             <h5 class="card-title"></h5>
             <p class="card-text">@Model.Description</p>
             @Model.Height" x @Model.Width" - @Model.Credits Credit(s)
-            <br/>
-            @foreach (var tag in Model.StickerTags.Select(m => m.Tag))
+            <br />
+            @if (Model.StickerTags != null)
             {
-                <span class="badge badge-primary">@tag.Name</span>
+                foreach (var tag in Model.StickerTags.Select(m => m.Tag))
+                {
+                    <span class="badge badge-primary">@tag.Name</span>
+                }
             }
+
         </div>
         <div class="card-footer text-muted">
             <a asp-action="Index" asp-controller="Sticker" asp-route-id="@Model.Id" class="btn btn-primary">View Sticker</a>

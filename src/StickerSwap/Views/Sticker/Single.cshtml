@@ -12,10 +12,14 @@
         <img src="/sticker/image/@Model.Id" class="rounded mx-auto d-block border" style="width: 18em" />
         <p class="lead">@Model.Description</p>
         <p class="lead">@Model.Height" x @Model.Width"</p>
-        @foreach (var tag in Model.StickerTags.Select(m => m.Tag))
+        @if (Model.StickerTags != null)
         {
-            <span class="badge badge-primary">@tag.Name</span>
+            foreach (var tag in Model.StickerTags.Select(m => m.Tag))
+            {
+                <span class="badge badge-primary">@tag.Name</span>
+            }
         }
+
         <hr class="my-4">
         <p>@Model.Quantity Available for @Model.Credits credit(s) a piece.</p>
         <hr class="my-4">
