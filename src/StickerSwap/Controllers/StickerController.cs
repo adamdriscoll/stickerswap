@@ -76,6 +76,7 @@ namespace StickerSwap.Controllers
             }
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = _dbContext.Users.First(m => m.Id == userId);
             var sticker = _dbContext.Stickers.Include(m => m.StickerTags).ThenInclude(m => m.Tag).FirstOrDefault(m => m.Id == id && m.User.Id == userId);
 
             if (sticker == null)
@@ -130,6 +131,11 @@ namespace StickerSwap.Controllers
 
             var allTags = existingTags.Concat(newTags);
 
+            if (viewModel.Quantity > 0)
+            {
+                user.Credits += viewModel.Quantity - sticker.Quantity;
+            }
+            
             sticker.Height = viewModel.Height;
             sticker.Width = viewModel.Width;
             sticker.Description = viewModel.Description;
@@ -161,7 +167,6 @@ namespace StickerSwap.Controllers
                 };
                 _dbContext.Add(stickerTag);
             }
-
 
             await _dbContext.SaveChangesAsync();
 
@@ -239,6 +244,8 @@ namespace StickerSwap.Controllers
                 User = user,
                 BlobMediaType = viewModel.Image.ContentType
             };
+
+            user.Credits += viewModel.Quantity;
 
             using (var memoryStream = new MemoryStream())
             {
@@ -361,7 +368,7 @@ namespace StickerSwap.Controllers
         [Route("search")]
         public IActionResult Search(SearchViewModel searchViewModel)
         {
-            var stickerCount = _dbContext.Stickers.Include(m => m.StickerTags).ThenInclude(m => m.Tag).Count(m => m.Title.Contains(searchViewModel.SearchText) || m.Description.Contains(searchViewModel.SearchText) || m.StickerTags.Any(x => x.Tag.Name.Contains(searchViewModel.SearchText)));
+            var stickerCount = _dbContext.Stickers.Where(m => m.Quantity > 0).Include(m => m.StickerTags).ThenInclude(m => m.Tag).Count(m => m.Title.Contains(searchViewModel.SearchText) || m.Description.Contains(searchViewModel.SearchText) || m.StickerTags.Any(x => x.Tag.Name.Contains(searchViewModel.SearchText)));
 
             var take = 20;
             var skip = 20 * searchViewModel.Page;

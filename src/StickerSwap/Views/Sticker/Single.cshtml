@@ -4,6 +4,11 @@
 
 @{
     ViewData["Title"] = Model.Title;
+    if (Model.StickerTags != null)
+    {
+        ViewData["Keywords"] = Model.StickerTags.Select(m => m.Tag.Name).Aggregate((x, y) => x + "," + y);
+    }
+
 }
 
     <div class="jumbotron">
