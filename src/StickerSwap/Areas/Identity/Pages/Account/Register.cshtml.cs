@@ -95,7 +95,7 @@ namespace StickerSwap.Areas.Identity.Pages.Account
                     return Page();
                 }
 
-                var user = new User { UserName = Input.UserName, Email = Input.Email, EnableEmail = true, Credits = 1; };
+                var user = new User { UserName = Input.UserName, Email = Input.Email, EnableEmail = true, Credits = 1 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
