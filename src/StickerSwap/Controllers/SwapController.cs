@@ -200,8 +200,6 @@ namespace StickerSwap.Controllers
                 {
                     await _emailSender.SendEmailAsync(swap.Sticker.User.Email, "Your Sticker Swap has completed!", $"Your Sticker Swap has completed! You just earned {swap.Credits} sticker credits!");
                 }
-
-                swap.Sticker.User.Credits += swap.Credits;
             }
 
             swap.Status = swapStatus;
