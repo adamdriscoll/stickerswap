@@ -21,8 +21,8 @@ namespace StickerSwap.Controllers
 
         public IActionResult Index()
         {
-            var newStickers = _dbContext.Stickers.Where(m => m.Quantity > 0).Include(m => m.StickerTags).ThenInclude(m => m.Tag).OrderByDescending(m => m.Created).Take(10);
-            var recentlySwapped = _dbContext.Swaps.OrderByDescending(m => m.Date).GroupBy(m => m.Sticker).Take(10).Select(m => m.Key).Include(m => m.StickerTags).ThenInclude(m => m.Tag);
+            var newStickers = _dbContext.Stickers.Where(m => m.Quantity > 0).Include(m => m.StickerTags).ThenInclude(m => m.Tag).OrderByDescending(m => m.Created).Take(12);
+            var recentlySwapped = _dbContext.Swaps.OrderByDescending(m => m.Date).GroupBy(m => m.Sticker).Take(12).Select(m => m.Key).Include(m => m.StickerTags).ThenInclude(m => m.Tag);
 
             var viewModel = new HomeViewModel
             {
