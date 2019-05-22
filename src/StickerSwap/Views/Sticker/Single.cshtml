@@ -8,6 +8,8 @@
     {
         ViewData["Keywords"] = Model.StickerTags.Select(m => m.Tag.Name).Aggregate((x, y) => x + "," + y);
     }
+    ViewData["Image"] = "~/sticker/image/" + Model.Id;
+    ViewData["Description"] = Model.Description;
 
 }
 
